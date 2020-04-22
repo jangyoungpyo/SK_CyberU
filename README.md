@@ -1,5 +1,5 @@
 # SK_CyberU
-# 최종 조별과제 - 인터넷 강의수강 시스템
+# 최종 과제 - SK사이버대학교 수강신청 시스템 
 
 - 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
 

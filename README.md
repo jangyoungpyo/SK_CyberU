@@ -51,10 +51,11 @@ SK Cyber University, Learning Managemnt System
 
 * 이벤트스토밍 결과:  http://msaez.io/#/storming/ykkPrHFkHENuuxqTB4Mw6VTSoUi2/mine/4852af164017e5192c4535619033dbb8/-M5VFqCmFpn9MGO3iZXE
 
-- Core Domain : 수강신청(front), 강의관리 : 핵심 서비스이며, 연간 Up-time SLA 수준을 99.999% 목표, 배포주기는 수강신청의 경우 1주일 1회 미만, 강의관리의 경우 1개월 1회 미만
-- Supporting Domain : Dashboard : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함.
-- General Domain : 결제 : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음.
-
+```
+- Core Domain : 수강신청(front), 강의관리 
+- Supporting Domain : Dashboard
+- General Domain : 결제 
+```
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
@@ -71,7 +72,7 @@ SK Cyber University, Learning Managemnt System
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 
 ```
-cd courseRegistrationSystem
+cd ClassRegistrationSystem
 mvn spring-boot:run
 
 cd paymentSystem
@@ -99,7 +100,7 @@ public class PaymentSystem {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private Long courseId;
+    private Long ClassId;
 
     @PostPersist
     public void onPostPersist(){
@@ -128,12 +129,12 @@ public class PaymentSystem {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getCourseId() {
-        return courseId;
+    public Long getClassId() {
+        return ClassId;
     }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
+    public void setClassId(Long ClassId) {
+        this.ClassId = ClassId;
     }
 }
 ```
@@ -266,12 +267,12 @@ public class PolicyHandler{
         try {
             if (paymentCompleted.isMe()) {
                 System.out.println("##### listener 수강신청완료 : " + paymentCompleted.toJson());
-                Optional<CourseRegistrationSystem> courseRegistrationSystemOptional = courseRegistrationSystemRepository.findById(paymentCompleted.getCourseId());
-                CourseRegistrationSystem courseRegistrationSystem = courseRegistrationSystemOptional.get();
-                courseRegistrationSystem.setStatus("결제 완료");
-                courseRegistrationSystem.setStudentId(courseRegistrationSystem.getStudentId());
+                Optional<ClassRegSystem> ClassRegSystemOptional = ClassRegSystemRepository.findById(paymentCompleted.getCourseId());
+                ClassRegSystem ClassRegSystem = ClassRegSystemOptional.get();
+                ClassRegSystem.setStatus("결제 완료");
+                ClassRegSystem.setStudentId(ClassRegSystem.getStudentId());
 
-                courseRegistrationSystemRepository.save(courseRegistrationSystem);
+                ClassRegSystemRepository.save(ClassRegSystem);
             }
         }catch(Exception e) {
 
@@ -284,8 +285,8 @@ public class PolicyHandler{
 # 강의 서비스 (lectureSystem) 를 잠시 내려놓음
 
 #수강신청 처리
-http POST localhost:8081/courseRegistrationSystem lectureId=1   #Success
-http POST localhost:8081/courseRegistrationSystem lectureId=2   #Success
+http POST localhost:8081/ClassRegSystem lectureId=1   #Success
+http POST localhost:8081/ClassRegSystem lectureId=2   #Success
 ```
 ![image](https://user-images.githubusercontent.com/48303857/79857884-6d354080-8409-11ea-9307-02288463bb13.png)
 
@@ -324,7 +325,7 @@ mvn spring-boot:run
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 수강신청(courseRegistration)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 수강신청(ClassReg)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -383,7 +384,7 @@ kubectl autoscale deploy pay --min=1 --max=10 --cpu-percent=15
 ```
 - CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://52.231.118.204:8080/courseRegistrationSystems POST {"lectureId": 1}'
+siege -c100 -t120S -r10 --content-type "application/json" 'http://52.231.118.204:8080/ClassRegSystems POST {"lectureId": 1}'
 
 ```
 

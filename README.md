@@ -1,9 +1,7 @@
 # SK_CyberU
 # 최종 과제 - SK사이버대학교 수강신청 시스템 
 
-- 장영표 
-- Hi-tech DT Platform 
-- 04302
+- 장영표, 04302, Hi-tech DT Platform
 
 
 # Table of contents

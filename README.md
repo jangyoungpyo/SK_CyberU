@@ -59,7 +59,7 @@ SK Cyber University, Learning Managemnt System
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
-![image](https://user-images.githubusercontent.com/63028469/79846797-d3b26280-83f9-11ea-9ad7-a7e6b4bea18e.png)
+![image](https://user-images.githubusercontent.com/38850007/79948013-fd2cc600-84ad-11ea-9635-aa8832a7d40e.png)
 
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
